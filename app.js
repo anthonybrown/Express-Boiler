@@ -2,6 +2,8 @@ var express      = require('express');
 var path         = require('path');
 var favicon      = require('serve-favicon');
 var logger       = require('morgan');
+var stylus			 = require('stylus');
+var nib					 = require('nib');
 var cookieParser = require('cookie-parser');
 var bodyParser   = require('body-parser');
 var nodemailer   = require('nodemailer');
@@ -12,6 +14,7 @@ var home    = require('./routes/home');
 var contact = require('./routes/contact');
 
 var app = express();
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -25,6 +28,18 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(require('stylus').middleware(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.use(stylus.middleware(
+  { src: __dirname + '/public'
+  , compile: compile
+  }
+))
+
+function compile(str, path) {
+  return stylus(str)
+    .set('filename', path)
+    .use(nib())
+}
 
 app.use('/', routes);
 app.use('/home', home);
